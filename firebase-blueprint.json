@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "Registration": {
+      "title": "Registration",
+      "description": "A student's registration for a teacher",
+      "type": "object",
+      "properties": {
+        "studentName": {
+          "type": "string",
+          "description": "Name of the student"
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Student ID (MSSV)"
+        },
+        "teacherId": {
+          "type": "string",
+          "description": "ID of the teacher"
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Time of registration"
+        },
+        "uid": {
+          "type": "string",
+          "description": "User ID of the person who registered"
+        }
+      },
+      "required": ["studentName", "studentId", "teacherId", "timestamp", "uid"]
+    }
+  },
+  "firestore": {
+    "registrations/{registrationId}": {
+      "schema": "Registration",
+      "description": "Collection of all student registrations"
+    }
+  }
+}

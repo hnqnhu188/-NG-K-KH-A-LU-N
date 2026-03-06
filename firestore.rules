@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: registrations
+    // Document ID: auto-generated
+    // Fields:
+    //   - studentName: string (required)
+    //   - studentId: string (required)
+    //   - teacherId: string (required)
+    //   - timestamp: number (required)
+    //   - uid: string (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "hnqnhu188@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidRegistration(data) {
+      return data.keys().hasOnly(['studentName', 'studentId', 'teacherId', 'timestamp', 'uid']) &&
+             data.studentName is string && data.studentName.size() > 0 && data.studentName.size() < 100 &&
+             data.studentId is string && data.studentId.size() > 0 && data.studentId.size() < 20 &&
+             data.teacherId is string && data.teacherId.size() > 0 && data.teacherId.size() < 50 &&
+             data.timestamp is number &&
+             data.uid == request.auth.uid;
+    }
+
+    match /registrations/{registrationId} {
+      // Anyone authenticated can read the list of registrations (to see counts/status)
+      allow read: if isAuthenticated();
+      
+      // Only the owner can create their registration
+      allow create: if isAuthenticated() && isValidRegistration(request.resource.data);
+      
+      // Only the owner or admin can delete a registration
+      allow delete: if isAuthenticated() && (isOwner(resource.data.uid) || isAdmin());
+      
+      // Updates are not allowed for registrations in this simple model
+      allow update: if false;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
+}

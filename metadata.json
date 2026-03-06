@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Hệ thống Đăng ký Giáo viên Hướng dẫn",
+  "description": "Một ứng dụng web chuyên nghiệp cho phép sinh viên đăng ký giáo viên hướng dẫn từ danh sách 7 giảng viên, với giới hạn tối đa 2 sinh viên cho mỗi giảng viên.",
+  "requestFramePermissions": []
+}
